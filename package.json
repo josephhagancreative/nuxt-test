@@ -1,0 +1,39 @@
+{
+  "name": "nuxt-app",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "dcc-up": "docker compose up -d",
+    "dcc-down": "docker compose down",
+    "drz-push": "drizzle-kit push",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
+    "@pinia/nuxt": "^0.5.1",
+    "drizzle-orm": "^0.30.10",
+    "drizzle-zod": "^0.5.1",
+    "nuxt": "^3.11.2",
+    "pinia": "^2.1.7",
+    "postgres": "^3.4.4",
+    "primeicons": "^7.0.0",
+    "primevue": "^3.52.0",
+    "sass": "^1.77.1",
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.17.0",
+    "@sidebase/nuxt-auth": "^0.7.2",
+    "drizzle-kit": "^0.21.1",
+    "eslint": "^9.2.0",
+    "nuxt-primevue": "^0.3.1"
+  }
+}
