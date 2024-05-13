@@ -7,8 +7,15 @@ export default defineNuxtConfig({
   css: [
     'primevue/resources/themes/aura-light-noir/theme.css',
     'primeicons/primeicons.css',
+    'assets/main.css',
   ],
-  modules: ['nuxt-primevue', '@sidebase/nuxt-auth', '@pinia/nuxt', '@pinia-plugin-persistedstate/nuxt'],
+  googleFonts: {
+    families: {
+      Raleway: true,
+      Ubuntu: true,
+    },
+  },
+  modules: ['nuxt-primevue', '@sidebase/nuxt-auth', '@pinia/nuxt', '@pinia-plugin-persistedstate/nuxt', '@nuxtjs/google-fonts'],
   primevue: {
     options: {
       ripple: true,
