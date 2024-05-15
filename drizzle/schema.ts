@@ -4,7 +4,7 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import type { z } from 'zod'
 
 export const todo = pgTable('todo', {
-  id: serial('id'),
+  id: serial('id').primaryKey(),
   text: text('text').notNull(),
   isComplete: boolean('is_complete').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
@@ -18,6 +18,7 @@ export const user = pgTable('user', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }),
   completedTodos: integer('completed_todos').default(0),
+  amountOfCarryOverTodos: integer('amount_of_carryover_todos').default(3),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 })
@@ -36,6 +37,9 @@ export const userRelations = relations(user, ({ many }) => ({
 export const todoInsertSchema = createInsertSchema(todo)
 export const todoSelectSchema = createSelectSchema(todo)
 export type Todo = z.infer<typeof todoSelectSchema>
+export type OutdatedTodo = Todo & {
+  selected: boolean
+}
 
 export const userInsertSchema = createInsertSchema(user)
 export const userSelectSchema = createSelectSchema(user)

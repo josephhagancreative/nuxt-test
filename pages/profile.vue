@@ -11,9 +11,13 @@
         <span class="value" v-if="!isEditMode">{{ user.name }}</span>
         <InputText class="value" v-else v-model="userNameRef" />
       </div>
+            <div class="form-item">
+        <span class="label">Email:</span>
+        <span class="value">{{ user?.email }}</span>
+      </div>
       <div class="form-item">
         <span class="label">Todos Completed:</span>
-        <span class="value">{{ user.completedTodos }}</span>
+        <span class="value">{{ user?.completedTodos }}</span>
         <!-- <InputText class="value" v-else v-model="userNameRef" /> -->
       </div>
       <div v-if="isEditMode" class="button-wrapper">
