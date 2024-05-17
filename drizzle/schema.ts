@@ -9,6 +9,7 @@ export const todo = pgTable('todo', {
   isComplete: boolean('is_complete').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
   userId: integer('user_id').notNull(),
+  expirationDate: timestamp('expiration_date').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 })

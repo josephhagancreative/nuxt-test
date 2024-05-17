@@ -1,5 +1,6 @@
 import { db } from '~/drizzle'
 import { todo } from '~/drizzle/schema'
+import { createExpirationDate } from '~/utils/createExpirationDate'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -8,6 +9,7 @@ export default defineEventHandler(async (event) => {
     .values({
       text: body.text,
       userId: body.userId,
+      expirationDate: createExpirationDate(),
     })
     .returning()
   return insertedTodo

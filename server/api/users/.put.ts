@@ -14,10 +14,17 @@ export default defineEventHandler(async (event) => {
       where: eq(user.id, body.userId),
     })
 
-    if (fetchedUser) {
+    if (fetchedUser && body.setCompleted === 1) {
       const [updatedUserWithTotal] = await db.update(user).set({ completedTodos: fetchedUser.completedTodos! + 1 }).where(eq(user.id, body.userId)).returning()
       if (updatedUserWithTotal)
         return updatedUserWithTotal
+    }
+    else {
+      if (fetchedUser && body.setCompleted === 0) {
+        const [updatedUserWithTotal] = await db.update(user).set({ completedTodos: fetchedUser.completedTodos! - 1 }).where(eq(user.id, body.userId)).returning()
+        if (updatedUserWithTotal)
+          return updatedUserWithTotal
+      }
     }
   }
 })
