@@ -4,7 +4,7 @@
       <div class="todo-item" v-for="todo in todos" :key="todo.id" :class="todo.selected && 'selected'">
         <p :class="todo.isComplete && 'isComplete'">{{ todo.text }}</p>
         <div class="buttons">
-          <Button class="button" v-if="!todo.isComplete" :icon="todo.selected ? 'pi pi-circle-fill' : 'pi pi-circle'" severity="contrast" size="small" @click="toggleSelectedTodo(todo.id)" text />
+          <Button class="button" v-if="!todo.isComplete" :icon="todo.selected ? 'pi pi-circle-fill' : 'pi pi-circle'" severity="contrast" size="small" @click="toggleSelectedTodo(todo.id, todo.isComplete)" text />
         </div>
       </div>
       </div>
@@ -19,7 +19,7 @@ import type { OutdatedTodo } from '~/drizzle/schema';
 const _props = defineProps<{
   todos: OutdatedTodo[]
   carryOverAmount: number
-  toggleSelectedTodo: (id: number) => void
+  toggleSelectedTodo: (id: number, isComplete: boolean) => void
 }>()
 
 const emits = defineEmits<{

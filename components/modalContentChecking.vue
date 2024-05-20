@@ -2,10 +2,6 @@
       <div class="todo-container">
       <p>Check off any completed todos:</p>
       <div class="todo-item" v-for="todo in todos" :key="todo.id">
-        <!-- <p :class="todo.isComplete && 'isComplete'">{{ todo.text }}</p>
-        <div class="buttons">
-          <Button class="button" v-if="!todo.isComplete" icon="pi pi-check" severity="success" size="small" @click="completeOutdatedTodo(todo.id, !todo.isComplete)" text />
-        </div> -->
         <TodoItem :todo="todo" :delete-todos="deleteTodos" :toggle-complete-todo="completeOutdatedTodo"  />
       </div>
       </div>
@@ -20,7 +16,7 @@ import type { Todo } from '~/drizzle/schema';
 const _props = defineProps<{
   todos: Todo[]
   completeOutdatedTodo: (id: number, isComplete: boolean) => void
-  deleteTodos: (id: number[]) => void
+  deleteTodos: (id: number[], userId: number) => void
 }>()
 
 const emits = defineEmits(["finishedChecking"])

@@ -2,21 +2,21 @@
   <div class="container">
     <h1 class="header">Hello {{ user?.name || "User" }}</h1>
     <h2 class="date">{{ formatDate(new Date(), "yyyy-mm-dd")  }}</h2>
-    <form class="input-form" @submit.prevent="addTodo">
+    <form class="input-form" @submit.prevent="handleAddToodo">
       <InputText v-model="textInputRef" size="small" />
-      <Button label="Add Todo" icon="pi pi-check" @click="addTodo" size="small" />
+      <Button label="Add Todo" icon="pi pi-check" @click="handleAddToodo" size="small" />
     </form>
     <div class="todo-container">
       <h3>Todos: </h3>
       <div class="todo-item" v-for="todo in todos" :key="todo.id">
-        <TodoItem :todo="todo" :delete-todos="deleteTodos" :toggle-complete-todo="toggleCompleteTodo" />
+        <TodoItem :todo="todo" :delete-todos="deleteTodos" :toggle-complete-todo="handleToggleCompleteTodo" />
       </div>
     </div>
   </div>
   <Dialog v-model:visible="modalVisible" modal :header="getModalHeader()" :style="{ width: '25rem' }" :closable="false">
-<ModalContentChecking v-if="isCheckingOutdatedTodos" :complete-outdated-todo="toggleCompleteTodo" @finished-checking="isCheckingOutdatedTodos = false"  :todos="outDatedTodos" :delete-todos="deleteTodos" />
+<ModalContentChecking v-if="isCheckingOutdatedTodos" :complete-outdated-todo="handleToggleCompleteTodo" @finished-checking="isCheckingOutdatedTodos = false"  :todos="outDatedTodos" :delete-todos="deleteTodos" />
 <ModalContentSaving
-v-else @handle-expired="handleExpiredTodos" :toggle-selected-todo="toggleSelectedTodo"  
+v-else @handle-expired="onHandleExpiredTodos" :toggle-selected-todo="handleToggleSelectedTodo"  
 :carry-over-amount="user?.amountOfCarryOverTodos!"
 :todos="outDatedTodos" />
 </Dialog>
@@ -25,7 +25,6 @@ v-else @handle-expired="handleExpiredTodos" :toggle-selected-todo="toggleSelecte
 <script lang="ts" setup>
 import {formatDate} from "date-fns"
 import ModalContentChecking from "~/components/modalContentChecking.vue";
-import type { OutdatedTodo, Todo } from '~/drizzle/schema';
 
 const modalVisible = ref(false)
 const isCheckingOutdatedTodos = ref(false)
@@ -41,155 +40,51 @@ const getModalHeader = () => {
 const userStore = useUserStore()
 const user = computed(() => userStore.getUser())
 
+const todoStore = useTodosStore()
+const {addTodo, getAllTodos, deleteTodos, checkForOutdatedTodos, toggleCompleteTodo, toggleSelectedTodo, handleExpiredTodos} = todoStore
+const {todos, outDatedTodos} = storeToRefs(todoStore)
+
 const textInputRef = ref("")
-const todos = ref<Todo[]>([])
-const outDatedTodos = ref<OutdatedTodo[]>([])
 
-const getAllTodos = async () => {
-  const fetchedTodos = await $fetch<Todo[]>(`/api/todos?userId=${user.value?.id}`)
-  if (fetchedTodos) todos.value = fetchedTodos
+const handleAddToodo = () => {
+  if (!textInputRef.value || !user.value) 
+    return
+  
+  addTodo(textInputRef.value, user.value.id)
+  textInputRef.value = ''
 }
 
-const addTodo = async () => {
-  const addedTodo = await $fetch<Todo>("/api/todos", {
-    method: "POST",
-    body: {
-      text: textInputRef.value,
-      userId: user.value?.id
-    }
-  })
-  todos.value.push(addedTodo)
-  textInputRef.value = ""
+const handleToggleCompleteTodo = async (id: number, isComplete: boolean) => {
+  if (!user.value) return
+  const updatedTotalCompletionsUser = await toggleCompleteTodo(id, isComplete, user.value.id )
+  userStore.setUser(updatedTotalCompletionsUser)
 }
 
-// TODO refactor to check todos or Outdated todos
-const toggleCompleteTodo = async (id: number, isComplete: boolean) => {
- await $fetch("/api/todos", {
-    method: "PUT",
-    body: {
-      userId: user.value?.id,
-      todoId: id,
-      isComplete,
-    }
-  })
-  const todoToUpdate = todos.value.find(todo => todo.id === id);
-    if (todoToUpdate)
-      todoToUpdate.isComplete = isComplete;
-      const updatedTotalCompletionsUser = await $fetch("/api/users/", {
-        method: "PUT",
-        body: {
-          userId: user.value?.id,
-          todoCompleted: true,
-          setCompleted: isComplete ? 1 : 0
-        }
-      })
-      if(updatedTotalCompletionsUser) 
-        userStore.setUser(updatedTotalCompletionsUser)
+const handleToggleSelectedTodo = (todoId: number) => {
+  if (!user.value?.amountOfCarryOverTodos) return
+  
+  toggleSelectedTodo(todoId, user.value.amountOfCarryOverTodos)
 }
 
-const checkForOutdatedTodos = () => {
-  const currentDateTime = new Date();
-  const currentTodos: Todo[] = [];
-  const outdatedTodos: OutdatedTodo[] = [];
+const onHandleExpiredTodos = () => {
+  if(!user.value) return
 
-  todos.value.forEach(todo => {
-    const todoExpirationDate = new Date(todo.expirationDate!);
+  handleExpiredTodos(user.value.id)
+    modalVisible.value = false
+}
 
-    if (currentDateTime > todoExpirationDate) 
-      outdatedTodos.push({...todo, selected: false});
-     else 
-      currentTodos.push(todo);
-    
-  });
+const init = async () => {
+    if (!user.value) return
+    await getAllTodos(user.value?.id)
 
-  todos.value = currentTodos;
-  outDatedTodos.value = [...outDatedTodos.value, ...outdatedTodos];
-
-  if (outdatedTodos.length > 0) 
-    modalVisible.value = true;
+    checkForOutdatedTodos()
+    if (outDatedTodos.value.length > 0)
+      modalVisible.value = true
     isCheckingOutdatedTodos.value = true
-};
-
-
-const deleteTodos = async (ids: number[]) => {
-  await $fetch("/api/todos", {
-    method: "DELETE",
-    body: {
-      todoId: ids,
-      userId: user.value?.id
-    }
-  })
-  await getAllTodos()
-  checkForOutdatedTodos()
-}
-
-const toggleSelectedTodo = (todoId: number) => {
-  const selectedCount = outDatedTodos.value.filter(todo => todo.selected).length;
-
-  const currentTodoIndex = outDatedTodos.value.findIndex(todo => todo.id === todoId);
-  if (currentTodoIndex === -1) return;
-
-  const currentTodo = outDatedTodos.value[currentTodoIndex];
-
-  if (!currentTodo.selected && user.value?.amountOfCarryOverTodos) {
-    if (selectedCount >= user.value?.amountOfCarryOverTodos) {
-      const firstSelectedIndex = outDatedTodos.value.findIndex(todo => todo.selected);
-      if (firstSelectedIndex !== -1) {
-        outDatedTodos.value[firstSelectedIndex] = {
-          ...outDatedTodos.value[firstSelectedIndex],
-          selected: false
-        };
-      }
-    }
-    outDatedTodos.value[currentTodoIndex] = {
-      ...currentTodo,
-      selected: true
-    };
-  } else {
-    outDatedTodos.value[currentTodoIndex] = {
-      ...currentTodo,
-      selected: false
-    };
-  }
-  outDatedTodos.value = [...outDatedTodos.value];
-};
-
-const handleExpiredTodos = async () => {
-  const selectedTodos = outDatedTodos.value.filter(todo => todo.selected);
-  const unselectedTodos = outDatedTodos.value.filter(todo => !todo.selected);
-
-  const todosToDelete = []
-  for (const todo of unselectedTodos) 
-    todosToDelete.push(todo.id)
-  
-  if (todosToDelete.length > 0) 
-    await deleteTodos(todosToDelete)
-  
-
-  const todosToUpdate = []
-  for (const todo of selectedTodos) 
-    todosToUpdate.push(todo.id)
-  
-
-    if (todosToUpdate.length > 0) {
-      await $fetch("/api/todos/update-expiration", {
-        method: "PUT",
-        body: {
-          todoIds: todosToUpdate
-        }
-      })
-    }
-
-  todos.value = [...todos.value, ...selectedTodos];
-
-  outDatedTodos.value = [];
-  todos.value = [...todos.value];
-  modalVisible.value = false
 }
 
 onMounted( async () =>{
-    await getAllTodos()
-    checkForOutdatedTodos()
+  await init()
 })
   
 </script>
@@ -238,7 +133,6 @@ margin-top: 20vh
   justify-content: space-between;
   outline: 1px solid #e2e2e2;
   border-radius: 0.5rem;
-  padding-left: 0.5rem;
 
   &.selected {
     outline: 2px solid #f7e581;
