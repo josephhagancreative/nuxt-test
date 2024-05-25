@@ -1,0 +1,24 @@
+
+@mixin apply-text-style($tag, $size, $weight, $decoration: null) {
+  
+  @if $tag == "H1" {
+    line-height: $size * 1.25 + px;
+    letter-spacing: 0.05em;
+
+  } @else if $tag == "BD" {
+    line-height: $size * 1.5 + px;
+    letter-spacing: 0.1em;
+  }
+  
+  font-size: $size + px;
+
+  @if $weight == "R" {
+    font-weight: 400;
+  } @else if $weight == "M" {
+    font-weight: 500;
+  }
+
+  @if $decoration == "U" {
+    text-decoration: underline;
+  }
+}

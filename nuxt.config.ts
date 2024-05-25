@@ -7,8 +7,17 @@ export default defineNuxtConfig({
   css: [
     'primevue/resources/themes/aura-light-noir/theme.css',
     'primeicons/primeicons.css',
-    'assets/main.css',
+    'assets/main.scss',
   ],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@import "@/assets/_text-styles.scss";',
+        },
+      },
+    },
+  },
   googleFonts: {
     families: {
       Raleway: true,
