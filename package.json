@@ -25,17 +25,17 @@
     "postgres": "^3.4.4",
     "primeicons": "^7.0.0",
     "primevue": "^3.52.0",
-    "sass": "^1.77.1",
+    "sass": "^1.77.2",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.17.0",
+    "@antfu/eslint-config": "^2.18.1",
     "@nuxtjs/google-fonts": "^3.2.0",
     "@sidebase/nuxt-auth": "^0.7.2",
-    "drizzle-kit": "^0.21.1",
-    "eslint": "^9.2.0",
+    "drizzle-kit": "^0.21.4",
+    "eslint": "^9.3.0",
     "nuxt-primevue": "^0.3.1"
   }
 }
