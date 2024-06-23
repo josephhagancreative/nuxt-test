@@ -14,34 +14,31 @@
 <script setup lang="ts">
 const model = defineModel<Booking>({required: true})
 
+const props = defineProps<{
+  allItems: Item[]
+}>()
+
+const emits = defineEmits(["updatedQuantity"])
+
 const onUpdate = (id: number, quantity: number) => {
   updateModelValue(id, quantity)
 }
 
 const isVisible = ref(false)
 
-const allItems = [
-  { name: 'item 1', id: 1, stock: 5, selectedQuantity: 0 },
-  { name: 'item 2', id: 2, stock: 10, selectedQuantity: 0 },
-  { name: 'item 3', id: 3, stock: 7, selectedQuantity: 0 },
-  { name: 'item 4', id: 4, stock: 2, selectedQuantity: 0 },
-]
-
 function updateModelValue(id: number, quantity: number) {
-  const updatedItem = allItems.find(item => item.id === id)
+  const updatedItem = props.allItems.find(item => item.id === id)
 
   if(updatedItem) {
     const modelItemIdx = model.value.items.findIndex(modelItem =>  modelItem.id === updatedItem.id )
     if(modelItemIdx !== -1) {
-      quantity === 0 ? model.value.items.splice(modelItemIdx) :
+      quantity === 0 ? model.value.items.splice(modelItemIdx, 1) :
       model.value.items[modelItemIdx].selectedQuantity = quantity
     } else {
-      if (quantity !== 0) {
-        const newItem = {...updatedItem, selectedQuantity: quantity}
-        model.value.items.push(newItem)
-      }
+      if (quantity !== 0) model.value.items.push({...updatedItem, selectedQuantity: quantity})
     }
   }
+  emits("updatedQuantity")
 }
 </script>
 
