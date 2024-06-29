@@ -1,13 +1,15 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   auth: {
     globalAppMiddleware: true,
   },
-  devtools: { enabled: true },
   css: [
     'primeicons/primeicons.css',
-    'assets/main.css',
+    '/assets/main.css',
   ],
+  devtools: { enabled: true },
+  future: {
+    compatibilityVersion: 4,
+  },
   googleFonts: {
     families: {
       Raleway: true,
@@ -23,6 +25,6 @@ export default defineNuxtConfig({
     },
   },
   primevue: {
-    importTheme: { from: '@/themes/mytheme.ts' },
+    importTheme: { from: '/themes/mytheme.js' },
   },
 })
