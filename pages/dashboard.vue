@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h1 class="header">Hello {{ user?.name || "User" }}</h1>
-    <h2 class="date">{{ formatDate(new Date(), "yyyy-mm-dd")  }}</h2>
+    <h2 class="date">{{ formatDate(new Date(), "yyyy-MM-dd")  }}</h2>
     <form class="input-form" @submit.prevent="handleAddToodo">
       <InputText v-model="textInputRef" size="small" />
       <Button label="Add Todo" icon="pi pi-check" @click="handleAddToodo" size="small" />
@@ -24,7 +24,6 @@ v-else @handle-expired="onHandleExpiredTodos" :toggle-selected-todo="handleToggl
 
 <script lang="ts" setup>
 import {formatDate} from "date-fns"
-import ModalContentChecking from "~/components/modalContentChecking.vue";
 
 const modalVisible = ref(false)
 const isCheckingOutdatedTodos = ref(false)
