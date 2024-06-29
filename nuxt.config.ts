@@ -5,7 +5,6 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   css: [
-    'primevue/resources/themes/aura-light-noir/theme.css',
     'primeicons/primeicons.css',
     'assets/main.css',
   ],
@@ -15,17 +14,15 @@ export default defineNuxtConfig({
       Ubuntu: true,
     },
   },
-  modules: ['nuxt-primevue', '@sidebase/nuxt-auth', '@pinia/nuxt', '@pinia-plugin-persistedstate/nuxt', '@nuxtjs/google-fonts'],
-  primevue: {
-    options: {
-      ripple: true,
-    },
-  },
+  modules: ['@sidebase/nuxt-auth', '@pinia/nuxt', '@pinia-plugin-persistedstate/nuxt', '@nuxtjs/google-fonts', '@primevue/nuxt-module'],
   runtimeConfig: {
     GOOGLE_CLIENT_ID: '',
     GOOGLE_CLIENT_SECRET: '',
     public: {
       env: 'DEV',
     },
+  },
+  primevue: {
+    importTheme: { from: '@/themes/mytheme.ts' },
   },
 })
